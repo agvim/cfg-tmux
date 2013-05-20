@@ -1,0 +1,6 @@
+#Alias for tmux display command (used to control the status bar)
+
+if [ -f $HOME/.tmux/tmd.sh ]; then
+    #tmux display, for the status bar
+    alias tmd=$HOME/.tmux/tmd.sh
+fi
