@@ -4,13 +4,8 @@
 #Attempts to spawn as less external processes as possible
 #WARNING: reads data from various system files so it is linux distro dependant
 
-function percentage {
-    #given a value and the total returns the percentage
-    PERCENTAGE=$((100 * $1 / $2))
-    #correct the percentage so it never gets 100%
-    #this way will be more readable and we save term space
-    if [[ $PERCENTAGE == 100 ]]; then PERCENTAGE=99; fi
-}
+. "$(dirname $0)/lib/display.sh"
+. "$(dirname $0)/lib/tmux.sh"
 
 #protecting them for tmux rewrite
 function init_cpu {
@@ -44,13 +39,6 @@ function cpu {
     CPUDATA[3]=$DIFF_TOTAL
 }
 
-function pretty_mem {
-    #converts a $1 integer that represents MB into GB with $2 decimals
-    #TODO XXX FIXME: THE CODE IS THE SAME IN pretty_net.
-    local DECIMALS=$(($1 % 1024 / (1024 / 10 ** $2)))
-    PRETTY_MEM=$(printf "%i.%0$2i\n" $(($1 / 1024)) $DECIMALS)
-}
-
 function mem-swap {
 #$ free -m
 #             total       used       free     shared    buffers     cached
@@ -59,12 +47,6 @@ function mem-swap {
 #Swap:         4290          0       4290
     local FREE=($(free -m))
     MEMSWAPDATA=(${FREE[15]} ${FREE[7]} ${FREE[19]} ${FREE[18]})
-}
-
-function pretty_net {
-    #converts a $1 integer that represents bits into KiB with $2 decimals
-    local DECIMALS=$(($1 % 1024 / (1024 / 10 ** $2)))
-    PRETTY_NET=$(printf "%i.%0$2i\n" $(($1 / 1024)) $DECIMALS)
 }
 
 function calculate_bw {
@@ -121,30 +103,6 @@ function netstats {
     NETDATA[4]=$RX
     NETDATA[5]=$TX_BW
     NETDATA[6]=$RX_BW
-}
-
-#THE TMUX CODE IS BASED ON THE FOLLOWING OUTPUT SHAPE:
-# $ tmux setenv HI "miu"
-# $ tmux showenv HI
-#HI=miu
-# $ tmux setenv -u HI
-# $ tmux showenv HI
-#unknown variable: HI
-function get_tmux {
-    #$1 is the variable name
-    IFS='='
-    local SHOWENV=($(tmux showenv -g "$1" 2>&1))
-    if [[ ${SHOWENV[0]} == "$1" ]]
-    then
-        VALUE=${SHOWENV[1]}
-        unset IFS
-        TMV=($VALUE)
-        return 0
-    else
-        #error case
-        unset IFS
-        return 1
-    fi
 }
 
 function tmux_cpu {
