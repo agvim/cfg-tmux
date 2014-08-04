@@ -62,9 +62,40 @@ function print_no {
     printf "no:%2s \n" $PERCENTAGE
 }
 
+function print_tmuxline {
+    #CPUDATA[2]=$DIFF_USED
+    #CPUDATA[3]=$DIFF_TOTAL
+    get_short "CPUDATA"
+    percentage ${TMV[2]} ${TMV[3]}
+    L=$PERCENTAGE
+    #MEMSWAPDATA="$MBCUSED $MTOTAL $SUSED $STOTAL"
+    get_short "MEMSWAPDATA"
+    percentage ${TMV[0]} ${TMV[1]}
+    M=$PERCENTAGE
+    #current date, max TX_BW, max RX_BW, prev_tx, prev_rx, tx_bw, rx_bw
+    get_short "NETDATA"
+    percentage ${TMV[6]} ${TMV[2]}
+    NI=$PERCENTAGE
+    #current date, max TX_BW, max RX_BW, prev_tx, prev_rx, tx_bw, rx_bw
+    get_short "NETDATA"
+    percentage ${TMV[5]} ${TMV[1]}
+    NO=$PERCENTAGE
+    #MEMSWAPDATA="$MBCUSED $MTOTAL $SUSED $STOTAL"
+    get_short "MEMSWAPDATA"
+    if [[ ${TMV[3]} != 0 ]]
+    then
+        percentage ${TMV[2]} ${TMV[3]}
+        S=$PERCENTAGE
+        printf "#[fg=colour61]l:%2s #[fg=colour64]m:%2s #[fg=colour125]s:%2s #[fg=colour166]ni:%2s #[fg=colour136]no:%2s\n" $L $M $S $NI $NO
+    else
+        printf "#[fg=colour61]l:%2s #[fg=colour64]m:%2s #[fg=colour166]ni:%2s #[fg=colour136]no:%2s\n" $L $M $NI $NO
+    fi
+}
+
 function print_help {
     echo "usage:"
     echo "$0 reset: resets the counters and historic data"
+    echo "$0 tmuxline: updates and prints all counters"
     echo "$0 <short>: prints the short form (% between 0 and 99) of a counter or 'err!' if there is an error. <short> can be:"
     echo "- l: cpu load"
     echo "- m: memory usage"
@@ -77,6 +108,12 @@ if [[ $# != 1 ]]; then print_help $0; exit 1; fi
 case $1 in
     "reset")
         reset_counters
+        ;;
+    "tmuxline")
+        . "$(dirname $0)/sysstats.sh"
+        tmux_stats
+        print_tmuxline
+        #[fg=colour61]#($tmd l)#[fg=colour64]#($tmd m)#[fg=colour125]#($tmd s)#[fg=colour166]#($tmd ni)#[fg=colour136]#($tmd no)#[fg=colour37]%R'
         ;;
     "l")
         print_l

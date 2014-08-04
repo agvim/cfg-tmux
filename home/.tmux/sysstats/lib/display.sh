@@ -9,8 +9,8 @@ function percentage {
 }
 
 #characters used for the bar
-BAR_CHAR="|"
-LIMIT_CHAR="|"
+BAR_CHAR="■"
+LIMIT_CHAR="■"
 EMPTY_CHAR=" "
 function percentage_bar {
     #given a value, the total and the horizontal size of the bar, returns the
