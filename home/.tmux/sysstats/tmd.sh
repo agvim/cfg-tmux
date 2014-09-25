@@ -86,9 +86,9 @@ function print_tmuxline {
     then
         percentage ${TMV[2]} ${TMV[3]}
         S=$PERCENTAGE
-        printf "#[fg=colour61]l:%2s #[fg=colour64]m:%2s #[fg=colour125]s:%2s #[fg=colour166]ni:%2s #[fg=colour136]no:%2s\n" $L $M $S $NI $NO
+        printf "#[fg=colour33]l:%2s #[fg=colour64]m:%2s #[fg=colour125]s:%2s #[fg=colour166]ni:%2s #[fg=colour136]no:%2s\n" $L $M $S $NI $NO
     else
-        printf "#[fg=colour61]l:%2s #[fg=colour64]m:%2s #[fg=colour166]ni:%2s #[fg=colour136]no:%2s\n" $L $M $NI $NO
+        printf "#[fg=colour33]l:%2s #[fg=colour64]m:%2s #[fg=colour166]ni:%2s #[fg=colour136]no:%2s\n" $L $M $NI $NO
     fi
 }
 

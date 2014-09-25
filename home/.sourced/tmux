@@ -1,0 +1,1 @@
+alias tmr='$HOME/.tmux/sysstats/tmd.sh reset'
