@@ -1,7 +1,7 @@
 # cfg-tmux:
 
 This is a homeshick configuration repository. See
-https://github.com/andsens/homeshick
+https://github.com/agvim/homeshick
 
 It depends on https://github.com/agvim/cfg-bash for the aliases (besides it
 integrates colors nicely)
