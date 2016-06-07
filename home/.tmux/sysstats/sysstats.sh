@@ -40,13 +40,15 @@ function cpu {
 }
 
 function mem-swap {
-#$ free -m
-#             total       used       free     shared    buffers     cached
-#Mem:          2759       2492        267          0        567        936
-#-/+ buffers/cache:        987       1771
-#Swap:         4290          0       4290
-    local FREE=($(free -m))
-    MEMSWAPDATA=(${FREE[15]} ${FREE[7]} ${FREE[19]} ${FREE[18]})
+# $ grep -E '^(Mem|Swap)' /proc/meminfo
+# MemTotal:       16385132 kB
+# MemFree:        10585440 kB
+# MemAvailable:   14531416 kB
+# SwapCached:            0 kB
+# SwapTotal:             0 kB
+# SwapFree:              0 kB
+    local MEMINFO=($(grep -E '^(Mem|Swap)' /proc/meminfo))
+    MEMSWAPDATA=(${MEMINFO[1]} ${MEMINFO[7]} ${MEMINFO[13]} ${MEMINFO[16]})
 }
 
 function calculate_bw {
@@ -242,15 +244,19 @@ case $1 in
         while true
         do
             update_stats
+            # echo percentage ${CPUDATA[2]} ${CPUDATA[3]}
             percentage ${CPUDATA[2]} ${CPUDATA[3]}
             LOAD=$PERCENTAGE
+            # echo percentage ${MEMSWAPDATA[0]} ${MEMSWAPDATA[1]}
             percentage ${MEMSWAPDATA[0]} ${MEMSWAPDATA[1]}
             RAM_PERCENTAGE=$PERCENTAGE
-            #echo $PERCENTAGE
+            # echo percentage ${MEMSWAPDATA[2]} ${MEMSWAPDATA[3]}
             percentage ${MEMSWAPDATA[2]} ${MEMSWAPDATA[3]}
             SWAP_PERCENTAGE=$PERCENTAGE
+            # echo percentage ${NETDATA[6]} ${NETDATA[2]}
             percentage ${NETDATA[6]} ${NETDATA[2]}
             RX_PER=$PERCENTAGE
+            # echo percentage ${NETDATA[5]} ${NETDATA[1]}
             percentage ${NETDATA[5]} ${NETDATA[1]}
             TX_PER=$PERCENTAGE
             printf "\rl:%2s m:%2s s:%2s ni:%2s no:%2s" $LOAD $RAM_PERCENTAGE $SWAP_PERCENTAGE $RX_PER $TX_PER

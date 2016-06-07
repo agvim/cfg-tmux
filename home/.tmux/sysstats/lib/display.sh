@@ -2,8 +2,8 @@
 
 function percentage {
     #given a value and the total returns the percentage
-    PERCENTAGE=$((100 * $1 / $2))
-    #correct the percentage so it never gets 100% 
+    if [[ $2 == 0 ]]; then PERCENTAGE=0; else PERCENTAGE=$((100 * $1 / $2)); fi
+    #correct the percentage so it never gets 100%
     #this way will be more readable and we save term space
     if [[ $PERCENTAGE == 100 ]]; then PERCENTAGE=99; fi
 }
