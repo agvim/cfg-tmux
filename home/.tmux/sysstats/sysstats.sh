@@ -48,7 +48,8 @@ function mem-swap {
 # SwapTotal:             0 kB
 # SwapFree:              0 kB
     local MEMINFO=($(grep -E '^(Mem|Swap)' /proc/meminfo))
-    MEMSWAPDATA=(${MEMINFO[1]} ${MEMINFO[7]} ${MEMINFO[13]} ${MEMINFO[16]})
+    # MEMSWAPDATA=(${MEMINFO[1]} ${MEMINFO[7]} ${MEMINFO[13]} ${MEMINFO[16]})
+    MEMSWAPDATA=($((${MEMINFO[1]} - ${MEMINFO[7]})) ${MEMINFO[1]} ${MEMINFO[13]} ${MEMINFO[16]})
 }
 
 function calculate_bw {
