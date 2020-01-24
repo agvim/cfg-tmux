@@ -62,7 +62,7 @@ function print_no {
     printf "no:%2s \n" $PERCENTAGE
 }
 
-function print_tmuxline {
+function print_tmuxline_p {
     #CPUDATA[2]=$DIFF_USED
     #CPUDATA[3]=$DIFF_TOTAL
     get_short "CPUDATA"
@@ -92,6 +92,64 @@ function print_tmuxline {
     fi
 }
 
+function print_tmuxline_h {
+    #CPUDATA[2]=$DIFF_USED
+    #CPUDATA[3]=$DIFF_TOTAL
+    BAR_SIZE=3
+    get_short "CPUDATA"
+    percentage_bar_h ${TMV[2]} ${TMV[3]} $BAR_SIZE
+    L="$PERCENTAGE_BAR"
+    #MEMSWAPDATA="$MBCUSED $MTOTAL $SUSED $STOTAL"
+    get_short "MEMSWAPDATA"
+    percentage_bar_h ${TMV[0]} ${TMV[1]} $BAR_SIZE
+    M="$PERCENTAGE_BAR"
+    #current date, max TX_BW, max RX_BW, prev_tx, prev_rx, tx_bw, rx_bw
+    get_short "NETDATA"
+    percentage_bar_h ${TMV[6]} ${TMV[2]} $BAR_SIZE
+    NI="$PERCENTAGE_BAR"
+    percentage_bar_h ${TMV[5]} ${TMV[1]} $BAR_SIZE
+    NO="$PERCENTAGE_BAR"
+    #MEMSWAPDATA="$MBCUSED $MTOTAL $SUSED $STOTAL"
+    get_short "MEMSWAPDATA"
+    if [[ ${TMV[3]} != 0 ]]
+    then
+        percentage_bar_h ${TMV[2]} ${TMV[3]} $BAR_SIZE
+        S="$PERCENTAGE_BAR"
+        printf "#[fg=colour33]l%s#[fg=colour64]m%s#[fg=colour125]s%s#[fg=colour166]i%s #[fg=colour136]o%s\n" "$L" "$M" "$S" "$NI" "$NO"
+    else
+        printf "#[fg=colour33]l%s#[fg=colour64]m%s#[fg=colour166]i%s#[fg=colour136]o%s\n" "$L" "$M" "$NI" "$NO"
+    fi
+}
+
+function print_tmuxline_v {
+    #CPUDATA[2]=$DIFF_USED
+    #CPUDATA[3]=$DIFF_TOTAL
+    BAR_SIZE=3
+    get_short "CPUDATA"
+    percentage_bar_v ${TMV[2]} ${TMV[3]}
+    L="$PERCENTAGE_BAR"
+    #MEMSWAPDATA="$MBCUSED $MTOTAL $SUSED $STOTAL"
+    get_short "MEMSWAPDATA"
+    percentage_bar_v ${TMV[0]} ${TMV[1]}
+    M="$PERCENTAGE_BAR"
+    #current date, max TX_BW, max RX_BW, prev_tx, prev_rx, tx_bw, rx_bw
+    get_short "NETDATA"
+    percentage_bar_v ${TMV[6]} ${TMV[2]}
+    NI="$PERCENTAGE_BAR"
+    percentage_bar_v ${TMV[5]} ${TMV[1]}
+    NO="$PERCENTAGE_BAR"
+    #MEMSWAPDATA="$MBCUSED $MTOTAL $SUSED $STOTAL"
+    get_short "MEMSWAPDATA"
+    if [[ ${TMV[3]} != 0 ]]
+    then
+        percentage_bar_v ${TMV[2]} ${TMV[3]}
+        S="$PERCENTAGE_BAR"
+        printf "#[fg=colour33]l%s#[fg=colour64]m%s#[fg=colour125]s%s#[fg=colour166]i%s#[fg=colour136]o%s\n" "$L" "$M" "$S" "$NI" "$NO"
+    else
+        printf "#[fg=colour33]l%s#[fg=colour64]m%s#[fg=colour166]i%s#[fg=colour136]o%s\n" "$L" "$M" "$NI" "$NO"
+    fi
+}
+
 function print_help {
     echo "usage:"
     echo "$0 reset: resets the counters and historic data"
@@ -112,7 +170,7 @@ case $1 in
     "tmuxline")
         . "$(dirname $0)/sysstats.sh"
         tmux_stats
-        print_tmuxline
+        print_tmuxline_h
         #[fg=colour61]#($tmd l)#[fg=colour64]#($tmd m)#[fg=colour125]#($tmd s)#[fg=colour166]#($tmd ni)#[fg=colour136]#($tmd no)#[fg=colour37]%R'
         ;;
     "l")

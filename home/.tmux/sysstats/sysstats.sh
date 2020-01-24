@@ -192,7 +192,7 @@ function tmux_update_stats {
 function tmux_stats {
     #get the stats at the specified frequency
     #(this way we can have multiple tmux sessions that share the same stats)
-    #the price to pay is that the data in some sessions can be up to 
+    #the price to pay is that the data in some sessions can be up to
     #DATAFREQUENCY seconds old
     get_tmux "DATAFREQUENCY"
     if [[ $? -eq 0 ]]
@@ -226,7 +226,9 @@ function update_stats {
 
 function print_help {
     echo "usage:"
-    echo "$0 continuous <iface> <refresh>: displays a line that refreshes every refresh seconds with the network device iface"
+    echo "$0 percentages <iface> <refresh>: displays a line that refreshes every refresh seconds with the network device iface"
+    echo "$0 hbars <iface> <refresh>: displays a line that refreshes every refresh seconds with the network device iface"
+    echo "$0 vbars <iface> <refresh>: displays a line that refreshes every refresh seconds with the network device iface"
     echo "$0 tmux: sets global variables in tmux."
 }
 
@@ -236,7 +238,7 @@ case $1 in
         if [[ $# != 1 ]]; then print_help $0; exit 1; fi
         tmux_stats
         ;;
-    "continuous")
+    "percentages")
         if [[ $# != 3 ]]; then print_help $0; exit 1; fi
         #init is needed for both single run and continuous
         init_cpu
@@ -261,6 +263,59 @@ case $1 in
             percentage ${NETDATA[5]} ${NETDATA[1]}
             TX_PER=$PERCENTAGE
             printf "\rl:%2s m:%2s s:%2s ni:%2s no:%2s" $LOAD $RAM_PERCENTAGE $SWAP_PERCENTAGE $RX_PER $TX_PER
+            sleep $3
+        done
+        ;;
+    "hbars")
+        if [[ $# != 3 ]]; then print_help $0; exit 1; fi
+        #init is needed for both single run and continuous
+        init_cpu
+        init_netstats $2
+        BAR_LENGTH=3
+        #continuous mode
+        while true
+        do
+            update_stats
+            percentage_bar_h "${CPUDATA[2]}" "${CPUDATA[3]}" "$BAR_LENGTH"
+            LOAD="$PERCENTAGE_BAR"
+            percentage_bar_h "${MEMSWAPDATA[0]}" "${MEMSWAPDATA[1]}" "$BAR_LENGTH"
+            RAM_PERCENTAGE="$PERCENTAGE_BAR"
+            # echo percentage ${MEMSWAPDATA[2]} ${MEMSWAPDATA[3]}
+            percentage_bar_h "${MEMSWAPDATA[2]}" "${MEMSWAPDATA[3]}" "$BAR_LENGTH"
+            SWAP_PERCENTAGE="$PERCENTAGE_BAR"
+            # echo percentage ${NETDATA[6]} ${NETDATA[2]}
+            percentage_bar_h "${NETDATA[6]}" "${NETDATA[2]}" "$BAR_LENGTH"
+            RX_PER="$PERCENTAGE_BAR"
+            # echo percentage ${NETDATA[5]} ${NETDATA[1]}
+            percentage_bar_h "${NETDATA[5]}" "${NETDATA[1]}" "$BAR_LENGTH"
+            TX_PER="$PERCENTAGE_BAR"
+            printf "\rl%s m%s s%s ni%s no%s" "$LOAD" "$RAM_PERCENTAGE" "$SWAP_PERCENTAGE" "$RX_PER" "$TX_PER"
+            sleep $3
+        done
+        ;;
+    "vbars")
+        if [[ $# != 3 ]]; then print_help $0; exit 1; fi
+        #init is needed for both single run and continuous
+        init_cpu
+        init_netstats $2
+        #continuous mode
+        while true
+        do
+            update_stats
+            percentage_bar_v "${CPUDATA[2]}" "${CPUDATA[3]}"
+            LOAD="$PERCENTAGE_BAR"
+            percentage_bar_v "${MEMSWAPDATA[0]}" "${MEMSWAPDATA[1]}"
+            RAM_PERCENTAGE="$PERCENTAGE_BAR"
+            # echo percentage ${MEMSWAPDATA[2]} ${MEMSWAPDATA[3]}
+            percentage_bar_v "${MEMSWAPDATA[2]}" "${MEMSWAPDATA[3]}"
+            SWAP_PERCENTAGE="$PERCENTAGE_BAR"
+            # echo percentage ${NETDATA[6]} ${NETDATA[2]}
+            percentage_bar_v "${NETDATA[6]}" "${NETDATA[2]}"
+            RX_PER="$PERCENTAGE_BAR"
+            # echo percentage ${NETDATA[5]} ${NETDATA[1]}
+            percentage_bar_v "${NETDATA[5]}" "${NETDATA[1]}"
+            TX_PER="$PERCENTAGE_BAR"
+            printf "\rl%s m%s s%s ni%s no%s" "$LOAD" "$RAM_PERCENTAGE" "$SWAP_PERCENTAGE" "$RX_PER" "$TX_PER"
             sleep $3
         done
         ;;
