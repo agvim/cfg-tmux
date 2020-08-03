@@ -144,9 +144,9 @@ function print_tmuxline_v {
     then
         percentage_bar_v ${TMV[2]} ${TMV[3]}
         S="$PERCENTAGE_BAR"
-        printf "#[fg=colour33]l%s#[fg=colour64]m%s#[fg=colour125]s%s#[fg=colour166]i%s#[fg=colour136]o%s\n" "$L" "$M" "$S" "$NI" "$NO"
+        printf "#[fg=colour33]%s#[fg=colour64]%s#[fg=colour125]%s#[fg=colour166] %s#[fg=colour136]%s\n" "$L" "$M" "$S" "$NI" "$NO"
     else
-        printf "#[fg=colour33]l%s#[fg=colour64]m%s#[fg=colour166]i%s#[fg=colour136]o%s\n" "$L" "$M" "$NI" "$NO"
+        printf "#[fg=colour33]%s#[fg=colour64]%s#[fg=colour166] %s#[fg=colour136]%s\n" "$L" "$M" "$NI" "$NO"
     fi
 }
 
@@ -170,7 +170,8 @@ case $1 in
     "tmuxline")
         . "$(dirname $0)/sysstats.sh"
         tmux_stats
-        print_tmuxline_h
+        # print_tmuxline_h
+        print_tmuxline_v
         #[fg=colour61]#($tmd l)#[fg=colour64]#($tmd m)#[fg=colour125]#($tmd s)#[fg=colour166]#($tmd ni)#[fg=colour136]#($tmd no)#[fg=colour37]%R'
         ;;
     "l")
