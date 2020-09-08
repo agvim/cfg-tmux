@@ -8,7 +8,7 @@ function percentage {
     if [[ $PERCENTAGE == 100 ]]; then PERCENTAGE=99; fi
 }
 
-# source display.sh; TOTAL=35; for ((W=0; W<=$TOTAL; W++)){ percentage_bar_v $W $TOTAL 3; printf "%2i '%s'\n"  "$W" "$PERCENTAGE_BAR"; }
+# source display.sh; SLEEPTIME=0.1; TOTAL=100; for ((W=0; W<=$TOTAL; W++)){ percentage_bar_v $W $TOTAL; printf "%3i '%s'\r"  "$W" "$PERCENTAGE_BAR"; sleep $SLEEPTIME; }
 
 #characters used for the bar
 # vertical bars TODO change code
@@ -30,6 +30,8 @@ function percentage_bar_v {
     PERCENTAGE_BAR=${VBARS[$LIMIT_IDX]}
 }
 
+# source display.sh; SLEEPTIME=0.1; TOTAL=100; for ((W=0; W<=$TOTAL; W++)){ percentage_bar_h $W $TOTAL 3 5; printf "%3i '%s'\r"  "$W" "$PERCENTAGE_BAR"; sleep $SLEEPTIME; }
+
 # horizontal bars
 HBARS=(" " "▏" "▎" "▍" "▌" "▋" "▊" "▉" "█")
 HBARSTOTAL=${#HBARS[*]} # to avoid counting bars every time
@@ -41,9 +43,8 @@ function percentage_bar_h {
     local UPDATED_TOTAL
     local AMOUNT_HBARS=0
     local HBAR_SIZE=0
-    # note that in zsh arrays are indexed starting on 1
     local LIMIT_IDX=0
-    if [[ $1 -ne 0 ]]
+    if [[ $2 -ne 0 ]]
     then
         # correct the total so it is a multiple of the number of bars as there
         # is truncation of decimals
