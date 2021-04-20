@@ -10,7 +10,7 @@
 function get_tmux {
     #$1 is the variable name
     IFS='='
-    local SHOWENV=($(tmux showenv -g "$1" 2>&1))
+    local SHOWENV=($(tmux showenv -g "$1" 2>/dev/null))
     if [[ ${SHOWENV[0]} == "$1" ]]
     then
         VALUE=${SHOWENV[1]}

@@ -1,8 +1,8 @@
 #!/bin/bash
 #gets the tmux environment variables, calculates the display stuff and prints it
 
-. "$(dirname $0)/lib/display.sh"
-. "$(dirname $0)/lib/tmux.sh"
+. ""$(dirname "$0")/lib/display.sh""
+. ""$(dirname "$0")/lib/tmux.sh""
 
 function reset_counters {
     #note that the interface is preserved
@@ -15,7 +15,7 @@ function reset_counters {
 }
 
 function get_short {
-    get_tmux $1
+    get_tmux "$1"
     if [[ $? -eq 1 ]]
     then
         printf "err! \n"
@@ -27,15 +27,15 @@ function print_l {
     #CPUDATA[2]=$DIFF_USED
     #CPUDATA[3]=$DIFF_TOTAL
     get_short "CPUDATA"
-    percentage ${TMV[2]} ${TMV[3]}
-    printf "l:%2s \n" $PERCENTAGE
+    percentage "${TMV[2]}" "${TMV[3]}"
+    printf "l:%2s \n" "$PERCENTAGE"
 }
 
 function print_m {
     #MEMSWAPDATA="$MBCUSED $MTOTAL $SUSED $STOTAL"
     get_short "MEMSWAPDATA"
-    percentage ${TMV[0]} ${TMV[1]}
-    printf "m:%2s \n" $PERCENTAGE
+    percentage "${TMV[0]}" "${TMV[1]}"
+    printf "m:%2s \n" "$PERCENTAGE"
 }
 
 function print_s {
@@ -43,52 +43,52 @@ function print_s {
     get_short "MEMSWAPDATA"
     if [[ ${TMV[3]} != 0 ]]
     then
-        percentage ${TMV[2]} ${TMV[3]}
-        printf "s:%2s \n" $PERCENTAGE
+        percentage "${TMV[2]}" "${TMV[3]}"
+        printf "s:%2s \n" "$PERCENTAGE"
     fi
 }
 
 function print_ni {
     #current date, max TX_BW, max RX_BW, prev_tx, prev_rx, tx_bw, rx_bw
     get_short "NETDATA"
-    percentage ${TMV[6]} ${TMV[2]}
-    printf "ni:%2s \n" $PERCENTAGE
+    percentage "${TMV[6]}" "${TMV[2]}"
+    printf "ni:%2s \n" "$PERCENTAGE"
 }
 
 function print_no {
     #current date, max TX_BW, max RX_BW, prev_tx, prev_rx, tx_bw, rx_bw
     get_short "NETDATA"
-    percentage ${TMV[5]} ${TMV[1]}
-    printf "no:%2s \n" $PERCENTAGE
+    percentage "${TMV[5]}" "${TMV[1]}"
+    printf "no:%2s \n" "$PERCENTAGE"
 }
 
 function print_tmuxline_p {
     #CPUDATA[2]=$DIFF_USED
     #CPUDATA[3]=$DIFF_TOTAL
     get_short "CPUDATA"
-    percentage ${TMV[2]} ${TMV[3]}
-    L=$PERCENTAGE
+    percentage "${TMV[2]}" "${TMV[3]}"
+    L="$PERCENTAGE"
     #MEMSWAPDATA="$MBCUSED $MTOTAL $SUSED $STOTAL"
     get_short "MEMSWAPDATA"
-    percentage ${TMV[0]} ${TMV[1]}
-    M=$PERCENTAGE
+    percentage "${TMV[0]}" "${TMV[1]}"
+    M="$PERCENTAGE"
     #current date, max TX_BW, max RX_BW, prev_tx, prev_rx, tx_bw, rx_bw
     get_short "NETDATA"
-    percentage ${TMV[6]} ${TMV[2]}
-    NI=$PERCENTAGE
+    percentage "${TMV[6]}" "${TMV[2]}"
+    NI="$PERCENTAGE"
     #current date, max TX_BW, max RX_BW, prev_tx, prev_rx, tx_bw, rx_bw
     get_short "NETDATA"
-    percentage ${TMV[5]} ${TMV[1]}
-    NO=$PERCENTAGE
+    percentage "${TMV[5]}" "${TMV[1]}"
+    NO="$PERCENTAGE"
     #MEMSWAPDATA="$MBCUSED $MTOTAL $SUSED $STOTAL"
     get_short "MEMSWAPDATA"
     if [[ ${TMV[3]} != 0 ]]
     then
-        percentage ${TMV[2]} ${TMV[3]}
-        S=$PERCENTAGE
-        printf "#[fg=colour33]l:%2s #[fg=colour64]m:%2s #[fg=colour125]s:%2s #[fg=colour166]ni:%2s #[fg=colour136]no:%2s\n" $L $M $S $NI $NO
+        percentage "${TMV[2]}" "${TMV[3]}"
+        S="$PERCENTAGE"
+        printf "#[fg=colour33]l:%2s #[fg=colour64]m:%2s #[fg=colour125]s:%2s #[fg=colour166]ni:%2s #[fg=colour136]no:%2s\n" "$L" "$M" "$S" "$NI" "$NO"
     else
-        printf "#[fg=colour33]l:%2s #[fg=colour64]m:%2s #[fg=colour166]ni:%2s #[fg=colour136]no:%2s\n" $L $M $NI $NO
+        printf "#[fg=colour33]l:%2s #[fg=colour64]m:%2s #[fg=colour166]ni:%2s #[fg=colour136]no:%2s\n" "$L" "$M" "$NI" "$NO"
     fi
 }
 
@@ -97,23 +97,23 @@ function print_tmuxline_h {
     #CPUDATA[3]=$DIFF_TOTAL
     BAR_SIZE=3
     get_short "CPUDATA"
-    percentage_bar_h ${TMV[2]} ${TMV[3]} $BAR_SIZE
+    percentage_bar_h "${TMV[2]}" "${TMV[3]}" "$BAR_SIZE"
     L="$PERCENTAGE_BAR"
     #MEMSWAPDATA="$MBCUSED $MTOTAL $SUSED $STOTAL"
     get_short "MEMSWAPDATA"
-    percentage_bar_h ${TMV[0]} ${TMV[1]} $BAR_SIZE
+    percentage_bar_h "${TMV[0]}" "${TMV[1]}" "$BAR_SIZE"
     M="$PERCENTAGE_BAR"
     #current date, max TX_BW, max RX_BW, prev_tx, prev_rx, tx_bw, rx_bw
     get_short "NETDATA"
-    percentage_bar_h ${TMV[6]} ${TMV[2]} $BAR_SIZE
+    percentage_bar_h "${TMV[6]}" "${TMV[2]}" "$BAR_SIZE"
     NI="$PERCENTAGE_BAR"
-    percentage_bar_h ${TMV[5]} ${TMV[1]} $BAR_SIZE
+    percentage_bar_h "${TMV[5]}" "${TMV[1]}" "$BAR_SIZE"
     NO="$PERCENTAGE_BAR"
     #MEMSWAPDATA="$MBCUSED $MTOTAL $SUSED $STOTAL"
     get_short "MEMSWAPDATA"
     if [[ ${TMV[3]} != 0 ]]
     then
-        percentage_bar_h ${TMV[2]} ${TMV[3]} $BAR_SIZE
+        percentage_bar_h "${TMV[2]}" "${TMV[3]}" "$BAR_SIZE"
         S="$PERCENTAGE_BAR"
         printf "#[fg=colour33]l%s#[fg=colour64]m%s#[fg=colour125]s%s#[fg=colour166]i%s #[fg=colour136]o%s\n" "$L" "$M" "$S" "$NI" "$NO"
     else
@@ -124,25 +124,24 @@ function print_tmuxline_h {
 function print_tmuxline_v {
     #CPUDATA[2]=$DIFF_USED
     #CPUDATA[3]=$DIFF_TOTAL
-    BAR_SIZE=3
     get_short "CPUDATA"
-    percentage_bar_v ${TMV[2]} ${TMV[3]}
+    percentage_bar_v "${TMV[2]}" "${TMV[3]}"
     L="$PERCENTAGE_BAR"
     #MEMSWAPDATA="$MBCUSED $MTOTAL $SUSED $STOTAL"
     get_short "MEMSWAPDATA"
-    percentage_bar_v ${TMV[0]} ${TMV[1]}
+    percentage_bar_v "${TMV[0]}" "${TMV[1]}"
     M="$PERCENTAGE_BAR"
     #current date, max TX_BW, max RX_BW, prev_tx, prev_rx, tx_bw, rx_bw
     get_short "NETDATA"
-    percentage_bar_v ${TMV[6]} ${TMV[2]}
+    percentage_bar_v "${TMV[6]}" "${TMV[2]}"
     NI="$PERCENTAGE_BAR"
-    percentage_bar_v ${TMV[5]} ${TMV[1]}
+    percentage_bar_v "${TMV[5]}" "${TMV[1]}"
     NO="$PERCENTAGE_BAR"
     #MEMSWAPDATA="$MBCUSED $MTOTAL $SUSED $STOTAL"
     get_short "MEMSWAPDATA"
     if [[ ${TMV[3]} != 0 ]]
     then
-        percentage_bar_v ${TMV[2]} ${TMV[3]}
+        percentage_bar_v "${TMV[2]}" "${TMV[3]}"
         S="$PERCENTAGE_BAR"
         printf "#[fg=colour33]%s#[fg=colour64]%s#[fg=colour125]%s#[fg=colour166] %s#[fg=colour136]%s\n" "$L" "$M" "$S" "$NI" "$NO"
     else
@@ -162,13 +161,13 @@ function print_help {
     echo "- no: monitored network interface outgoing usage compared to the daemon sessions maximum"
 }
 
-if [[ $# != 1 ]]; then print_help $0; exit 1; fi
+if [[ $# != 1 ]]; then print_help "$0"; exit 1; fi
 case $1 in
     "reset")
         reset_counters
         ;;
     "tmuxline")
-        . "$(dirname $0)/sysstats.sh"
+        . ""$(dirname "$0")/sysstats.sh""
         tmux_stats
         # print_tmuxline_h
         print_tmuxline_v

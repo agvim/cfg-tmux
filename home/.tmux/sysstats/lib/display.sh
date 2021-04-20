@@ -14,17 +14,15 @@ function percentage {
 # vertical bars TODO change code
 VBARS=(" " "▁" "▂" "▃" "▄" "▅" "▆" "▇" "█")
 VBARSTOTAL=${#VBARS[*]} # to avoid counting bars every time
-VBAR_EMPTY_C=${VBARS[0]}
-VBAR_FULL_C=${VBARS[$(($VBARSTOTAL - 1))]}
 function percentage_bar_v {
     #given a value and the total, returns the percentage bar
     local LIMIT_IDX=0
     if [[ $2 -ne 0 ]]
     then
-        LIMIT_IDX=$(($1 * $VBARSTOTAL / $2))
+        LIMIT_IDX=$(($1 * VBARSTOTAL / $2))
         if [[ $LIMIT_IDX -ge $VBARSTOTAL ]]
         then
-            LIMIT_IDX=$(( $VBARSTOTAL - 1 ))
+            LIMIT_IDX=$(( VBARSTOTAL - 1 ))
         fi
     fi
     PERCENTAGE_BAR=${VBARS[$LIMIT_IDX]}
@@ -36,7 +34,7 @@ function percentage_bar_v {
 HBARS=(" " "▏" "▎" "▍" "▌" "▋" "▊" "▉" "█")
 HBARSTOTAL=${#HBARS[*]} # to avoid counting bars every time
 HBAR_EMPTY_C=${HBARS[0]}
-HBAR_FULL_C=${HBARS[$(($HBARSTOTAL - 1))]}
+HBAR_FULL_C=${HBARS[$((HBARSTOTAL - 1))]}
 function percentage_bar_h {
     #given a value, the total and the horizontal size of the bar, returns the
     #percentage bar
@@ -49,9 +47,9 @@ function percentage_bar_h {
         # correct the total so it is a multiple of the number of bars as there
         # is truncation of decimals
         UPDATED_TOTAL=$(( $2 - ($2 % $3) ))
-        AMOUNT_HBARS=$(( $3 * $1 / $UPDATED_TOTAL )) # $((3 * 99 / 100))
-        HBAR_SIZE=$(( $UPDATED_TOTAL / $3 ))
-        LIMIT_IDX=$(( (($1) % $HBAR_SIZE) * $HBARSTOTAL / $HBAR_SIZE ))
+        AMOUNT_HBARS=$(( $3 * $1 / UPDATED_TOTAL )) # $((3 * 99 / 100))
+        HBAR_SIZE=$(( UPDATED_TOTAL / $3 ))
+        LIMIT_IDX=$(( (($1) % HBAR_SIZE) * HBARSTOTAL / HBAR_SIZE ))
     fi
     local I
     PERCENTAGE_BAR=""

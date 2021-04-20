@@ -1,1 +1,2 @@
 alias tmr='$HOME/.tmux/sysstats/tmd.sh reset'
+alias tmux='tmux -f $HOME/.tmux/tmux-$THEME.conf'
