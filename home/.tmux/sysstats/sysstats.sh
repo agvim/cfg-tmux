@@ -160,7 +160,11 @@ function tmux_netstats {
     if [[ $? -eq 1 ]]
     then
         #attempt to run anyway with eth0 if not defined
-        IFACE="eth0"
+        IFACE=$(ls -1 /sys/class/net | grep -v "lo" | head -n 1)
+        if [ "$IFACE" != "" ]
+        then
+            tmux setenv NETDATAIFACE "$IFACE"
+        fi
     else
         IFACE="$TMV"
     fi
