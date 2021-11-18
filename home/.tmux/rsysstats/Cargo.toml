@@ -11,3 +11,6 @@ edition = "2018"
 # strip = true # only on nightly, use cargo strip on stable
 lto = true # optimize at link stage (remove dead code)
 panic = "abort" # remove backtrace code
+
+[dependencies]
+nix = "0.18"

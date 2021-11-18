@@ -10,8 +10,8 @@ use std::process;
 use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::{Duration, SystemTime};
+use nix::unistd::getuid;
 
-const SOCKET: &str = "/tmp/tmux-rsysstats.sock";
 const WORK_SLEEP_DURATION: Duration = Duration::from_millis(1000);
 const SOCKET_TIMEOUT: Duration = Duration::from_millis(1000);
 const MAX_INACTIVE_TIME: Duration = Duration::from_secs(5);
@@ -268,6 +268,7 @@ fn update_netstats(
 
 /// load data calculation loop and server killing on inactivity code
 fn server_work(
+    socket: &str,
     net_interface: &str,
     lastconnection: Arc<Mutex<SystemTime>>,
     ld: Arc<Mutex<LoadData>>,
@@ -299,7 +300,7 @@ fn server_work(
             if lastconnection.elapsed().unwrap_or_default() > MAX_INACTIVE_TIME {
                 // force delete the socket file and exit
                 // TODO: nicely close the socket instead
-                let _ = std::fs::remove_file(SOCKET);
+                let _ = std::fs::remove_file(socket);
                 process::exit(0x0);
             }
         }
@@ -309,13 +310,13 @@ fn server_work(
     }
 }
 
-/// spawh the unix socket server on a thread and call the load calculation loop function
-fn main_server(net_interface: &str) -> std::io::Result<()> {
+/// spawn the unix socket server on a thread and call the load calculation loop function
+fn main_server(socket: &str, net_interface: &str) -> std::io::Result<()> {
     // force delete the socket file (ignore any potential error result)
-    let _ = std::fs::remove_file(SOCKET);
+    let _ = std::fs::remove_file(socket);
 
     // establish a new socket and handle clients in a separate thread
-    let listener = UnixListener::bind(SOCKET)?;
+    let listener = UnixListener::bind(socket)?;
 
     let now = SystemTime::now();
     let lastconnection = Arc::new(Mutex::new(now));
@@ -340,7 +341,7 @@ fn main_server(net_interface: &str) -> std::io::Result<()> {
 
     // the main thread will do the computations and stop the server when no requests are received
     // for a period of time
-    server_work(net_interface, lastconnection, ld, maxbw);
+    server_work(socket, net_interface, lastconnection, ld, maxbw);
     Ok(())
 }
 
@@ -427,10 +428,10 @@ fn print_ld_shell(ld: &LoadData) {
 
 /// connect to the server and either request the load data
 /// or request the max reference bandwidths to be reset
-fn main_client(reset_bw_max: bool) -> std::io::Result<()> {
+fn main_client(socket: &str, reset_bw_max: bool) -> std::io::Result<()> {
     let mut stream: UnixStream;
     if reset_bw_max {
-        match UnixStream::connect(SOCKET) {
+        match UnixStream::connect(socket) {
             Ok(mut stream) => {
                 let _ = stream.write(b"m");
                 Ok(())
@@ -444,7 +445,7 @@ fn main_client(reset_bw_max: bool) -> std::io::Result<()> {
         let mut bytes: [u8; 5] = [0; 5];
         let tmux_output: bool = env::var("TERM").unwrap_or_default() == "tmux-256color";
         loop {
-            stream = UnixStream::connect(SOCKET)?;
+            stream = UnixStream::connect(socket)?;
             stream
                 .write_all(b"r")
                 .expect("error communicating with the server");
@@ -498,17 +499,20 @@ fn main() {
     let mode: &str = &args.next().unwrap_or_else(|| "-c".to_string());
     // println!("{}", mode);
 
+    // println!("{}", getuid());
+    let socket: String = format!("/tmp/tmux-rsysstats.{}.sock", getuid());
+
     match mode {
         "-c" => {
-            match main_client(false) {
+            match main_client(&socket, false) {
                 Ok(_client) => {}
                 Err(_err) => {
                     // start the server
                     process::Command::new(program).arg("-s").spawn().unwrap();
                     // loop trying to connect to the server
                     loop {
-                        main_client(false)
-                            .unwrap_or_else(|_| thread::sleep(WORK_SLEEP_DURATION / 5));
+                        main_client(&socket, false)
+                            .unwrap_or_else(|_| thread::sleep(WORK_SLEEP_DURATION / 2));
                     }
                 }
             }
@@ -518,7 +522,7 @@ fn main() {
             let net_interface =
                 discover_interface().expect("unable to discover the network interface");
             println!("{}", net_interface);
-            match main_server(&net_interface) {
+            match main_server(&socket, &net_interface) {
                 Ok(_server) => {}
                 Err(err) => {
                     println!("Error: {}", err);
@@ -526,7 +530,7 @@ fn main() {
             }
         }
         "-r" => {
-            main_client(true).unwrap();
+            main_client(&socket, true).unwrap();
         }
         _ => {
             println!("unknown mode");
