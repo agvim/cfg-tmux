@@ -4,4 +4,4 @@
 # for the rust version
 alias tmr='$HOME/.tmux/rsysstats/target/release/rsysstats -r'
 # alias load the proper themed tmux config
-alias tmux='tmux -f $HOME/.tmux/tmux-$THEME.conf'
+alias tmux='tmux -f $HOME/.config/tmux/tmux-$THEME.conf'

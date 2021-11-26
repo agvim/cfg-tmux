@@ -13,6 +13,7 @@ use std::time::{Duration, SystemTime};
 use nix::unistd::getuid;
 
 const WORK_SLEEP_DURATION: Duration = Duration::from_millis(1000);
+//const WORK_SLEEP_DURATION: Duration = Duration::from_millis(500);
 const SOCKET_TIMEOUT: Duration = Duration::from_millis(1000);
 const MAX_INACTIVE_TIME: Duration = Duration::from_secs(5);
 
@@ -500,7 +501,7 @@ fn main() {
     // println!("{}", mode);
 
     // println!("{}", getuid());
-    let socket: String = format!("/tmp/tmux-rsysstats.{}.sock", getuid());
+    let socket: String = format!("/run/user/{}/tmux-rsysstats.socket", getuid());
 
     match mode {
         "-c" => {
