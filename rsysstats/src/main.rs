@@ -12,8 +12,8 @@ use std::thread;
 use std::time::{Duration, SystemTime};
 use nix::unistd::getuid;
 
-const WORK_SLEEP_DURATION: Duration = Duration::from_millis(1000);
-//const WORK_SLEEP_DURATION: Duration = Duration::from_millis(500);
+//const WORK_SLEEP_DURATION: Duration = Duration::from_millis(1000);
+const WORK_SLEEP_DURATION: Duration = Duration::from_millis(500);
 const SOCKET_TIMEOUT: Duration = Duration::from_millis(1000);
 const MAX_INACTIVE_TIME: Duration = Duration::from_secs(5);
 
@@ -385,11 +385,6 @@ fn print_ld_tmux(ld: &LoadData) {
 
 /// print the percentage and bars of each load data item with terminal color codes
 fn print_ld_shell(ld: &LoadData) {
-    const BLUE: &str = "\x1b[34m";
-    const GREEN: &str = "\x1b[32m";
-    const MAGENTA: &str = "\x1b[35m";
-    const RED: &str = "\x1b[31m";
-    const YELLOW: &str = "\x1b[33m";
     fn max_99(p: i8) -> i8 {
         if p >= 100 {
             99
@@ -397,29 +392,41 @@ fn print_ld_shell(ld: &LoadData) {
             p
         }
     }
+    fn escapecode(parameter:&str, code:&str) -> String {
+        format!("\x1b[{};{}m", parameter, code)
+    }
+    const FG: &str = "38;2";
+    const BG: &str = "48;2";
+    const BASE02: &str = "7;54;66";
+    const BLUE: &str = "38;139;210";
+    const GREEN: &str = "133;153;0";
+    const MAGENTA: &str = "211;54;130";
+    const RED: &str = "220;50;47";
+    const YELLOW: &str = "181;137;0";
+
     print!(
         "\r{}cpu({:2}%):{} {}mem({:2}%):{}",
-        BLUE,
+        escapecode(FG, BLUE),
         max_99(ld.cpu_load),
         percentage_bar_v(ld.cpu_load),
-        GREEN,
+        escapecode(FG, GREEN),
         max_99(ld.mem_load),
         percentage_bar_v(ld.mem_load)
     );
     if ld.swap_load != -1 {
         print!(
             "{}swp({:2}%):{}",
-            MAGENTA,
+            escapecode(FG, MAGENTA),
             max_99(ld.swap_load),
             percentage_bar_v(ld.swap_load)
         );
     }
     print!(
         " {}ni({:2}%):{} {}no({:2}%):{} ",
-        RED,
+        escapecode(FG, RED),
         max_99(ld.net_in),
         percentage_bar_v(ld.net_in),
-        YELLOW,
+        escapecode(FG, YELLOW),
         max_99(ld.net_out),
         percentage_bar_v(ld.net_out)
     );

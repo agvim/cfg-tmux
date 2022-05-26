@@ -2,6 +2,6 @@
 # for the shell version
 # alias tmr='$HOME/.tmux/sysstats/tmd.sh reset'
 # for the rust version
-alias tmr='$HOME/.tmux/rsysstats/target/release/rsysstats -r'
+alias tmr="rsysstats -r"
 # alias load the proper themed tmux config
-alias tmux='tmux -f $HOME/.config/tmux/tmux-$THEME.conf'
+alias tmux="tmux -f $HOME/.config/tmux/tmux-$THEME.conf"
