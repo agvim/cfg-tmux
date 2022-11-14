@@ -415,7 +415,7 @@ fn print_ld_shell(ld: &LoadData) {
     );
     if ld.swap_load != -1 {
         print!(
-            "{}swp({:2}%):{}",
+            " {}swp({:2}%):{}",
             escapecode(FG, MAGENTA),
             max_99(ld.swap_load),
             percentage_bar_v(ld.swap_load)
